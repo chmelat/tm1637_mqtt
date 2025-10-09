@@ -1,0 +1,17 @@
+[Unit]
+Description=TM1637 Temperature Display Service
+StartLimitIntervalSec=86400
+StartLimitBurst=2
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/home/tch/tm1637_temperature
+ExecStart=/home/tch/tm1637_temperature/tm1637_temperature
+Restart=always
+RestartSec=600
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
