@@ -314,11 +314,18 @@ ls -la /usr/local/bin/r4dcb08
 /usr/local/bin/r4dcb08 -f
 ```
 
-**High CPU usage**
-```bash
-# Check measurement interval
-sudo tm1637_temperature -i 60    # Longer interval
-```
+**High CPU usage on RPi1**
+
+The pigpio library uses a background thread that continuously samples GPIO pins. This causes noticeable CPU load, especially on older Raspberry Pi models:
+
+| Model | Default (5μs) | Optimized (10μs) |
+|-------|---------------|------------------|
+| RPi1  | ~23% CPU      | ~12% CPU         |
+| RPi2+ | <5% CPU       | <3% CPU          |
+
+The program uses the maximum sampling period (10μs) to minimize CPU usage. This is configured via `gpioCfgClock(10, PI_CLOCK_PCM, 0)` before pigpio initialization.
+
+Note: The measurement interval (`-i` flag) has minimal impact on CPU usage - the load comes from pigpio's continuous GPIO sampling, not from temperature readings.
 
 ### Systemd Service Problems
 

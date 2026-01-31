@@ -85,6 +85,11 @@ static int TM1637_validate_gpio_pins() {
  * Sets pins as INPUT (high-Z state), pull-up resistors pull them to HIGH
  */
 int TM1637_init() {
+    // Configure pigpio sampling rate to reduce CPU usage
+    // Default is 5us which causes ~23% CPU on RPi1
+    // Maximum period is 10us (still ~12% on RPi1, but half the load)
+    gpioCfgClock(10, PI_CLOCK_PCM, 0);
+
     // Initialize pigpio library
     if (gpioInitialise() < 0) {  // Error initializing library
         fprintf(stderr, "Error: Cannot initialize pigpio library\n");
