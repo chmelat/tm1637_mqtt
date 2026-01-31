@@ -10,9 +10,12 @@
  * TM1637 DIO -> GPIO 24 + 4.7k pull-up to 3.3V
  */
 
+#define _DEFAULT_SOURCE
+
 #include <stdio.h>
 #include <unistd.h>
 #include <stdint.h>
+#include <time.h>
 #include <gpiod.h>
 #include "tm1637_gpiod.h"
 
