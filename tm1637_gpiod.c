@@ -164,26 +164,45 @@ void TM1637_cleanup(void) {
 int TM1637_write_num(int16_t num) {
     buf[0] = ADR;
 
-    if (num >= 0) {
-        buf[1] = 0x00;
-    } else {
-        buf[1] = 0x40;
+    if (num < 0) {
+        /* Negative: -99.9 to -0.1 */
+        buf[1] = 0x40;  /* minus */
         num = -num;
-    }
-
-    uint16_t n = (uint16_t)num;
-    uint8_t d2 = n % 10; n /= 10;
-    uint8_t d1 = n % 10;
-    uint8_t d0 = n / 10;
-
-    if (d0 < 10) {
+        uint16_t n = (uint16_t)num;
+        uint8_t d2 = n % 10; n /= 10;
+        uint8_t d1 = n % 10;
+        uint8_t d0 = n / 10;
+        if (d0 >= 10) goto overflow;
         buf[2] = digits[d0];
         buf[3] = digits[d1] | 0x80;  /* decimal point */
         buf[4] = digits[d2];
+    } else if (num < 1000) {
+        /* Small positive: 0.0 to 99.9 */
+        buf[1] = 0x00;  /* space */
+        uint16_t n = (uint16_t)num;
+        uint8_t d2 = n % 10; n /= 10;
+        uint8_t d1 = n % 10;
+        uint8_t d0 = n / 10;
+        buf[2] = digits[d0];
+        buf[3] = digits[d1] | 0x80;  /* decimal point */
+        buf[4] = digits[d2];
+    } else if (num < 10000) {
+        /* Large positive: 100.0 to 999.9 */
+        uint16_t n = (uint16_t)num;
+        uint8_t d3 = n % 10; n /= 10;
+        uint8_t d2 = n % 10; n /= 10;
+        uint8_t d1 = n % 10;
+        uint8_t d0 = n / 10;
+        buf[1] = digits[d0];  /* hundreds */
+        buf[2] = digits[d1];  /* tens */
+        buf[3] = digits[d2] | 0x80;  /* units with decimal point */
+        buf[4] = digits[d3];  /* tenths */
     } else {
-        buf[2] = 0x3F;  /* O */
-        buf[3] = 0x71;  /* F */
-        buf[4] = 0x38;  /* L */
+overflow:
+        buf[1] = 0x3F;  /* O */
+        buf[2] = 0x71;  /* F */
+        buf[3] = 0x38;  /* L */
+        buf[4] = 0x00;
     }
 
     return (TM1637_send(buf, 5) == ACK) ? 0 : -1;

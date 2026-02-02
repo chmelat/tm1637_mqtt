@@ -31,7 +31,7 @@ static void on_message(struct mosquitto *m, void *userdata,
 
         float temp;
         if (sscanf(buf, "%f", &temp) == 1) {
-            if (temp >= -999.9f && temp <= 999.9f) {
+            if (temp >= -99.9f && temp <= 999.9f) {
                 last_temp = (int16_t)(temp * 10);  // "-2.3" → -23
                 last_message_time = time(NULL);
             } else {

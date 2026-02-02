@@ -86,15 +86,17 @@ sudo ./tm1637_temperature -b mqtt.local -t home/temperature -p 1884 -i 5
 # Publish test temperature
 mosquitto_pub -h 192.168.200.12 -t sensors/r4dcb08/1/temperature/ch1 -m "23.5"
 mosquitto_pub -h 192.168.200.12 -t sensors/r4dcb08/1/temperature/ch1 -m "-5.2"
+mosquitto_pub -h 192.168.200.12 -t sensors/r4dcb08/1/temperature/ch1 -m "123.4"
 ```
 
 ### Display states
 
 - `----` - Waiting for first MQTT message
-- `23.5` - Normal temperature display (with decimal point)
-- `-5.2` - Negative temperature
+- ` 23.5` - Temperature 0.0 to 99.9°C (leading space)
+- `123.4` - Temperature 100.0 to 999.9°C
+- `-5.2` - Negative temperature -99.9 to -0.1°C
 - `Err` - Parse error (invalid MQTT payload)
-- `OFL` - Overflow (temperature out of display range ±99.9°C)
+- `OFL` - Overflow (temperature out of range -99.9 to 999.9°C)
 - `OLd` - Stale data (no message received within watchdog timeout)
 
 ## Watchdog
